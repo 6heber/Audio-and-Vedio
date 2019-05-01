@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        .box{
+            width:540px;height:332px;position: absolute;
+            top:50%;left:50%;border:1px solid #ceccbf;
+            margin: -116px 0 0 -270px;box-shadow: 0 0 4px
+        }
+        .vedio{
+            width:100%;height:305px;background: #000;float: left;
+        }
+        .vedioNode{
+            width:100%;height:27px;background: url("images/ctrs_bg.gif") repeat-x;
+            float: left;
+        }
+        .playNode{
+            cursor: pointer;
+            background: url("images/playNode.png") no-repeat;
+            width:15px;height:17px;float: left;margin:6px 0 0 14px;
+        }
+        .pauseNode{ cursor: pointer;
+            background: url("images/pause.png") no-repeat;
+            width:15px;height:17px;float: left;margin:6px 0 0 14px;
+        }
+        .progressNode{
+            cursor:pointer;
+            width:267px;height:10px;float:left;
+            background: url("images/load_bg.png") repeat-x;
+            margin:9px 0 0 14px;position: relative;
+        }
+        .progressNode .left{
+            background: url("images/left_bg.png") repeat-x;
+            width: 3px;height:100%;position: absolute;top:0;left: 0;
+        }
+        .progressNode .right{
+            background: url("images/right_bg.png") repeat-x;
+            width: 3px;height:100%;position: absolute;top:0;right: 0;
+        }
+        .crlNode{
+            width:17px;height:17px;position: absolute;
+            background: url("images/crl_bg.png");
+            top:-3px;left:-1px;z-index: 5;
+        }
+        .lineNode{
+            width:0%;height:7px;position: absolute;top:1px;left:1px;
+            background: url("images/line_bg.png") repeat-x;
+        }
+        .lineNode .lineRight{
+            background: url("images/line_r_bg.png") no-repeat;
+            width:2px;height:7px;position: absolute;top:0;left:0;
+        }
+        .timeNode{
+            float:left;color:#fff;font-size:10px;
+            width:75px;height:10px;margin:5px 0 0 14px;
+        }
+        .volumeNode{
+            width:17px;height:16px;float: left;margin:5px 0 0 14px;
+            background: url("images/volume_bg.png");
+        }
+        .volieProgress{cursor: pointer;
+            width:61px;height:8px;float: left;
+            background: url("images/volumeLine_bg.png");
+            margin:10px 0 0 9px;position: relative;
+        }
+        .volueLeft{
+            width:3px;height:7px;
+            background: url("images/v_left.png") no-repeat;
+        }
+        .volueRight{
+            width:3px;height:7px;position: absolute;top:0;right:0;
+            background: url("images/v_right.png") no-repeat;
+        }
+        .volueLine{
+            background: url("images/vo_d.png") no-repeat;width:15px;
+            height:13px;position: absolute;cursor: pointer;
+            top:-3px;left:59px;
+        }
+        .fullNode{
+            background: url("images/full_bg.png") no-repeat;
+            width:15px;height:17px;float:right;
+            margin:5px 5px 0 0;
+        }
+        .fullNode:hover{
+            background: url("images/full_hover_bg.png") no-repeat;
+            width:15px;height:17px;float:right;
+            margin:5px 5px 0 0;
+        }
+    </style>
+</head>
+<body>
+<div class="box">
+    <video src="data/imooc.mp4" poster="data/poster.jpg" class="vedio"></video>
+    <div class="vedioNode">
+        <div class="playNode"></div>
+        <div class="progressNode">
+            <div class="left"></div>
+            <div class="right"></div>
+            <!-- 拖动进度条的按钮 -->
+            <div class='crlNode'></div>
+            <!--真正进度条-->
+            <div class="lineNode">
+                <div class='lineRight'></div>
+            </div>
+        </div>
+        <!--时间-->
+        <div class="timeNode">
+            <span class="now">00:00</span>
+            <span>-</span>
+            <span class="all"></span>
+        </div>
+        <!--声音-->
+        <div class="volumeNode"></div>
+        <!--声音进度条-->
+        <div class="volieProgress">
+            <div class="volueLeft"></div>
+            <div class="volueRight"></div>
+            <div class="volueLine"></div>
+        </div>
+        <!--全屏-->
+        <div class="fullNode"></div>
+    </div>
+</div>
+<script>
+    var playNode=document.querySelector(".playNode"),//播放器按钮
+        vedio=document.querySelector(".vedio"), //播放器
+        lineLode=document.querySelector(".lineNode"),//真正进度条
+        progressNode=document.querySelector(".progressNode"),//进度条外部元素
+        crlNode=document.querySelector(".crlNode"),//进度条按钮
+        fullNode=document.querySelector(".fullNode"),//全屏按钮
+        timeNode=document.querySelector(".timeNode"),//时间
+        now=document.querySelector(".now"),//现在的时间
+        all=document.querySelector(".all"), //所有时间
+        volueLine=document.querySelector(".volueLine"),//声音进度条
+        b=document.querySelector(".box"),
+        volieProgress=document.querySelector(".volieProgress") ,
+        playbtn=true;
+    //播放暂停事件
+    playNode.onclick=function(){
+        playbtn=!playbtn;
+        if(playbtn==false){
+            vedio.play();
+            playNode.className="pauseNode";
+        }else{
+            vedio.pause();
+            playNode.className="playNode";
+        }
+    }
+    //全屏事件
+    fullNode.onclick=function(){
+        if(vedio.webkitRequestFullscreen)
+        {vedio.webkitRequestFullscreen();}
+        else if(vedio.mozRequestFullscreen){
+            vedio.mozRequestFullscreen();
+        }else{
+            vedio.requestFullscreen();
+        }
+    }
+    //时间
+    vedio.addEventListener('canplay',function(){
+        var needTime=parseInt(vedio.duration);
+        var s=needTime%60;
+        var m=parseInt(needTime/60);
+        var timer=toDou(m)+':'+toDou(s);
+        all.innerHTML=timer;
+    })
+    //时间不足10的计算
+    function toDou(num){
+        return num<10?'0'+num:num;
+    }
+    //视频播放，进度条滑动
+    vedio.addEventListener('timeupdate',function(){
+       //进度条的宽度
+        lineLode.style.width=vedio.currentTime/vedio.duration*100+'%';
+        //按钮的位置
+        crlNode.style.left=lineLode.offsetWidth - 3 +'px'
+        var needtime=parseInt(vedio.currentTime);
+        var s=needtime%60;
+        var m=parseInt(needtime/60);
+        var timer=toDou(m)+':'+toDou(s);
+        now.innerHTML=timer;
+    },false)
+    //声音的拖拽
+    volueLine.onmousedown=function(e){
+        var ev=e||event;
+        var l=ev.clientX-this.offsetLeft;
+        document.onmousemove=function(e){//鼠标拖动
+            var ev=e||event;
+            var  needX=ev.clientX-l;
+            var max=volueLine.parentNode.offsetWidth-3;
+            needX=needX<-3?-3:needX;
+            needX=needX>max?max:needX;
+            var lastVolume = (volueLine.offsetLeft + 2)
+                    / volueLine.parentNode.offsetWidth ;
+            vedio.volume = lastVolume < 0 ? 0 : lastVolume;//设置音量
+            volueLine.style.left=needX+'px';
+        };
+        document.onmouseup = function(e){
+            document.onmousemove = document.onmouseup = null;
+        }
+        return false;
+    }
+
+    progressNode.onclick=function(e){
+        var ev=e||event;
+        vedio.currentTime=vedio.duration*((ev.clientX-(this.offsetLeft+ b.offsetLeft))/
+                this.offsetWidth);
+        lineLode.style.width=((ev.clientX-(this.offsetLeft+ b.offsetLeft))/
+        this.offsetWidth)*100+'%'
+    }
+    //视频滚动条拖拽
+    crlNode.onmousedown=function(e){
+        var ev=e||event;
+        var l=ev.clientX-this.offsetLeft;
+        vedio.pause();
+        document.onmousemove=function(e){
+            var ev=e||event;
+            var needX=ev.clientX-l;
+            var max=progressNode.offsetWidth-1;
+            needX = needX < -1 ? -1 : needX;
+            needX = needX > max ? max : needX;
+            crlNode.style.left=needX+'px';//按钮位置
+            lineLode.style.width=(crlNode.offsetLeft+9)/progressNode.offsetWidth
+            *100+'%';
+        }
+        document.onmouseup=function(){
+            document.onmousemove = document.onmouseup = null;
+            vedio.currentTime=vedio.duration*(crlNode.offsetLeft+1)/
+                    progressNode.offsetWidth;
+            if(playbtn==false){
+                vedio.play();
+                playNode.className="pauseNode";
+            }else{
+                vedio.pause();
+                playNode.className="playNode";
+            }
+        };
+        return false;
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,
+    minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <link href="../bootstrap/css/bootstrap.css" rel="stylesheet">
+    <script src="../bootstrap/js/jquery-3.1.1.js"></script>
+    <script src="../bootstrap/js/bootstrap.js"></script>
+    <style>
+        *{
+            margin:0;padding:0;
+        }
+        .box{
+            position: absolute;
+            top:50%;left:50%;
+            margin:-230px 0 0 -270px;
+            width:540px;
+            height:310px;
+            border:1px solid #ceccbf;
+            border-radius: 5px;
+        }
+        .musName{
+            width:100%;height:30px;text-align: center;line-height: 30px;
+            font-size: 16px;
+        }
+        .musBg{
+            width:100%;height:198px;
+
+            background-size: 100% 198px;
+        }
+        .lineNode{
+            width:100%;height:46px;background: #ceccbf;
+            display: flex;justify-content: center;align-items: center;
+        }
+        .lineNode .progress{
+            width:80%;height:13px;margin-top:20px;
+        }
+        .pre{
+            margin:7px 0 0 50px;float: left;
+        }
+        .play{
+            margin:7px 0 0 30px;float: left;
+        }
+        .next{
+            margin:7px 0 0 30px;float: left;
+        }
+        .volume{
+            margin:7px 0 0 60px;float: left;
+        }
+        .bottom .progress{
+            width:100px;height:10px;float: left;
+            margin:12px 0 0 10px;
+        }
+        .bottom .progress .progress-bar{
+            background: #2e2e2e;
+        }
+    </style>
+</head>
+<body>
+<div class="box">
+    <div class="musName"></div>
+    <div class="musBg"></div>
+    <div class="lineNode">
+        <div class="progress " id="progress1">
+           <div class="progress-bar progress-bar-success" aria-valuemax='100'
+                style="width:0%;" id="p">
+               <div class="trueLine"></div>
+           </div>
+        </div>
+    </div>
+    <div class="bottom">
+        <div class="pre" >
+            <span class="glyphicon glyphicon-backward " id="pre"></span>
+        </div>
+        <div class="play" >
+            <span class="glyphicon glyphicon-play" id="play"></span>
+        </div>
+        <div class="next" >
+            <span class="glyphicon glyphicon-forward" id="next"></span>
+        </div>
+        <div class="volume">
+            <span class="glyphicon glyphicon-volume-up" id="volume"></span>
+        </div>
+        <div class="progress" id="progress">
+            <div id="pv" class="progress-bar " aria-valuemax="100" style="width:100%" id="progress-bar">
+
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var musName=document.querySelector('.musName'),
+        musBg=document.querySelector(".musBg"),
+        pre=document.getElementById("pre"),
+        next=document.getElementById("next"),
+        play=document.getElementById("play"),
+        volume=document.getElementById("volume"),
+        p=document.getElementById("p"),
+        progressVolume=document.querySelector("#progress"),
+        progressMusic=document.querySelector("#progress1"),
+        progressBar=document.getElementById("progress-bar"),
+            b=document.querySelector(".box"),
+        pv=document.querySelector("#pv"),
+        playBtn=true;
+    var flag=true;
+
+
+   // var audio=new Audio();
+    let allMusic = [{
+        'MusicSrc':'mus/可惜没如果.mp3',//歌曲路径
+        'MusicPic':'music/pic/fmt01.jpg',//背景图
+        'MusicName':'可惜没有如果'    //歌名
+    },{
+        'MusicSrc':'mus/问.mp3',
+        'MusicPic':'music/pic/fmt02.png',
+        'MusicName':'问'
+
+    },{
+        'MusicSrc':'mus/我的一个道姑朋友.mp3',
+        'MusicPic':'music/pic/fmt03.jpg',
+        'MusicName':'我的一个道姑朋友'
+
+    },{
+        'MusicSrc':'mus/那些你很冒险的梦.mp3',
+        'MusicPic':'music/pic/fmt04.jpg',
+        'MusicName':'那些你很冒险的梦'
+
+    },{
+        'MusicSrc':'mus/只有一个你.mp3',
+        'MusicPic':'music/pic/fmt05.jpg',
+        'MusicName':'只有一个你'
+
+    },{
+        'MusicSrc':'mus/走在冷风中.mp3',
+        'MusicPic':'music/pic/fmt06.jpg',
+        'MusicName':'走在冷风中'
+
+    }],index = 0;
+
+    //静音
+    volume.onclick= function () {
+        flag = !flag;
+        if(flag==false){
+            volume.className='glyphicon glyphicon-volume-off';
+            pv.style.width='0%';
+            myAudio.volume=0;
+
+        }else{
+            volume.className='glyphicon glyphicon-volume-up';
+            pv.style.width='100%';
+            myAudio.volume=1;
+        }
+    }
+    var myAudio=new Audio();
+    myAudio.src = allMusic[index].MusicSrc;
+
+    //给封面赋值
+    musBg.style.backgroundImage = 'url('+allMusic[index].MusicPic+')';
+
+    //给音乐名称
+    musName.innerHTML = allMusic[index].MusicName;
+
+    //播放暂停的事件
+    play.onclick = function(){
+        //myAudio.play();
+        playBtn = !playBtn;
+        if(playBtn == false){
+            myAudio.play();
+            play.className='glyphicon glyphicon-pause';
+        }
+        else{
+            myAudio.pause();
+            play.className='glyphicon glyphicon-play';
+        }
+    };
+    //音乐播放函数
+    function playm(){
+        myAudio.src=allMusic[index].MusicSrc;//等号两边要有空格
+        myAudio.currentTime=0;
+        p.style.width='0%';
+        if(playBtn==false){
+            myAudio.play();
+        }else{
+            myAudio.pause();
+        }
+        //给封面赋值
+        musBg.style.backgroundImage = 'url('+allMusic[index].MusicPic+')';
+
+        //给音乐名称
+        musName.innerHTML = allMusic[index].MusicName;
+    }
+    //上一首，下一首
+    pre.onclick=function(){
+        index--;
+        if(index<0){
+            index=allMusic.length-1;
+        }
+        playm();
+    }
+    next.onclick=function(){
+        index++;
+        if(index>=allMusic.length){
+            index=0;
+        }
+        playm();
+    }
+    //进度条计算
+    myAudio.addEventListener('timeupdate',function(){
+        p.style.width=myAudio.currentTime/myAudio.duration*100+'%';
+    })
+    //拖拽进度条，并在此处播放
+    progressMusic.onclick=function(e){
+        var e1=e||event;
+        myAudio.currentTime=myAudio.duration*((e1.clientX-(this.offsetLeft+ b.offsetLeft))/this.offsetWidth);
+        p.style.width=((e1.clientX-(this.offsetLeft+ b.offsetLeft))/this.offsetWidth)*100+'%'
+    }
+    //声音进度条
+    progressVolume.onclick=function(e){
+        var e2=e||event;
+        myAudio.volume=((e2.clientX-(this.offsetLeft+ b.offsetLeft))/this.offsetWidth)
+        if(myAudio.volume>0.5){
+            volume.className="glyphicon glyphicon-volume-up";
+        }else if(myAudio.volume<0.5&&myAudio.volume>0.01){
+            volume.className="glyphicon glyphicon-volume-down";
+        }else{
+
+            volume.className='glyphicon glyphicon-volume-off';
+        }
+        pv.style.width=((e2.clientX-(this.offsetLeft+ b.offsetLeft))/this.offsetWidth)*100+'%'
+    }
+</script>
+</body>
+</html>
